@@ -1,0 +1,29 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.marvinweber.isaac.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "ItemEntityMixin",
+    "MinecraftServerMixin",
+    "PlayerEntityMixin",
+    "ScoreboardMixin",
+    "ScreenHandlerMixin",
+    "ServerPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
+    "ExplosionMixin"
+  ],
+  "client": [
+    "AbstractClientPlayerEntityMixin",
+    "ClientPlayerEntityMixin",
+    "GameOptionsMixin",
+    "GameRendererMixin",
+    "InGameHudMixin",
+    "KeyboardInputMixin"
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

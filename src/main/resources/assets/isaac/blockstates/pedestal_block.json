@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "isaac:block/pedestal_block" }
+  }
+}

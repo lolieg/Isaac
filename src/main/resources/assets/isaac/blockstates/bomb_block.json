@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "isaac:block/bomb_block" }
+  }
+}

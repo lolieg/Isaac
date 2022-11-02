@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "isaac",
+  "version": "${version}",
+  "name": "Isaac",
+  "description": "The Binding of Isaac in Minecraft",
+  "authors": [
+    "lolieg"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/isaac/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "me.marvinweber.isaac.client.IsaacClient"
+    ],
+    "server": [
+      "me.marvinweber.isaac.server.IsaacServer"
+    ],
+    "main": [
+      "me.marvinweber.isaac.Isaac"
+    ]
+  },
+  "mixins": [
+    "isaac.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.12.6",
+    "fabric": "*",
+    "minecraft": "1.17.1"
+  }
+}
