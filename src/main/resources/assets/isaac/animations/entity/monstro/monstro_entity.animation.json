@@ -1,0 +1,72 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.monstro.idle": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "body": {
+          "scale": {
+            "0.0": {
+              "vector": [
+                1,
+                1,
+                1
+              ]
+            },
+            "1.0": {
+              "vector": [
+                1,
+                0.98,
+                1
+              ]
+            },
+            "2.0": {
+              "vector": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.monstro.small_jump": {
+      "animation_length": 0.91667,
+      "bones": {
+        "body": {
+          "position": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.5": {
+              "vector": [
+                0,
+                10,
+                0
+              ],
+              "easing": "easeInQuint"
+            },
+            "0.9167": {
+              "vector": [
+                0,
+                0,
+                0
+              ],
+              "easing": "easeInElastic",
+              "easingArgs": [
+                1.5
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "geckolib_format_version": 2
+}
