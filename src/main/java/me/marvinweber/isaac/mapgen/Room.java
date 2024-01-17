@@ -9,12 +9,17 @@ import me.marvinweber.isaac.mapgen.rooms.RoomProperties;
 import me.marvinweber.isaac.mapgen.rooms.Spawner;
 import me.marvinweber.isaac.mapgen.rooms.layouts.Entities;
 import me.marvinweber.isaac.mapgen.rooms.layouts.RoomLayout;
+import me.marvinweber.isaac.mapgen.rooms.layouts.SpecialRooms;
 import me.marvinweber.isaac.registry.common.EntityRegistry;
+import me.marvinweber.isaac.stats.HealthManager;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +36,7 @@ public class Room {
     public RoomState roomState;
     public RoomState roomStateBefore;
     public boolean entered;
+    public boolean visible;
 
     public ArrayList<BaseEntity> enemies;
     public RoomLayout roomLayout;
@@ -41,6 +47,7 @@ public class Room {
     public Spawner spawner;
 
     public String itemPoolName;
+    public SpecialRooms type;
 
     public Room(int gridX, int gridY, RoomProperties properties) {
 
@@ -54,10 +61,18 @@ public class Room {
 
         this.roomState = RoomState.IDLE;
         this.entered = false;
+        this.visible = false;
 
         this.enemies = new ArrayList<>();
         this.roomLayout = null;
         this.itemPoolName = "";
+    }
+
+    public Room(int gridX, int gridY, boolean entered, boolean visible, SpecialRooms type) {
+        this(gridX, gridY, new RoomProperties(10, Blocks.DARK_OAK_WOOD, Blocks.DARK_OAK_PLANKS));
+        this.entered = entered;
+        this.visible = visible;
+        this.type = type;
     }
 
     public static List<Integer> getRange(int first, int second) {
@@ -183,7 +198,7 @@ public class Room {
                 doors) {
             for (Player player :
                     game.players) {
-                if (door.coords.contains(new Vec3d((int) Math.round(player.playerEntity.getX()), (int) Math.round(player.playerEntity.getY()), (int) Math.round(player.playerEntity.getZ())))) {
+                if (door.coords.contains(new Vec3i((int) Math.round(player.playerEntity.getX()), (int) Math.round(player.playerEntity.getY()), (int) Math.round(player.playerEntity.getZ())))) {
                     game.onInDoorSpace(this, door, player);
                 }
 
@@ -198,6 +213,34 @@ public class Room {
 
     public void setRandomRoomLayout(ArrayList<RoomLayout> roomLayouts, Random random) {
 
+    }
+
+    public static void serialize(PacketByteBuf packetByteBuf, Room room) {
+        packetByteBuf.writeInt(room.gridX);
+        packetByteBuf.writeInt(room.gridY);
+        packetByteBuf.writeBoolean(room.entered);
+        packetByteBuf.writeBoolean(room.visible);
+        if (room.type != null) {
+            packetByteBuf.writeVarInt(room.type.ordinal());
+        } {
+            packetByteBuf.writeVarInt(-1);
+        }
+    }
+
+    public static Room deserialize(PacketByteBuf packetByteBuf) {
+        int gridX = packetByteBuf.readInt();
+        int gridY = packetByteBuf.readInt();
+        boolean entered = packetByteBuf.readBoolean();
+        boolean visible = packetByteBuf.readBoolean();
+
+        int typeOrdinal = packetByteBuf.readVarInt();
+        SpecialRooms type = null;
+        if (typeOrdinal >= 0) {
+            type = SpecialRooms.values()[typeOrdinal];
+        }
+
+
+        return new Room(gridX, gridY, entered, visible, type);
     }
 
     /**

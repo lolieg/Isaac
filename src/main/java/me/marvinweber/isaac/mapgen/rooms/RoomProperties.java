@@ -8,7 +8,7 @@ public class RoomProperties {
     public Block defaultFloor;
     public Block defaultWall;
 
-    RoomProperties(int defaultHeight, Block defaultFloor, Block defaultWall) {
+    public RoomProperties(int defaultHeight, Block defaultFloor, Block defaultWall) {
         this.defaultHeight = defaultHeight;
         this.defaultFloor = defaultFloor;
         this.defaultWall = defaultWall;

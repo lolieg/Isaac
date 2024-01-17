@@ -17,9 +17,9 @@ public class ClientPlayerEntityMixin {
             cir.cancel();
     }
 
-    @Inject(method = "setSprinting", at = @At(value = "HEAD"), cancellable = true)
-    private void setSprinting(boolean sprinting, CallbackInfo ci) {
+    @Inject(method = "canStartSprinting", at = @At(value = "HEAD"), cancellable = true)
+    private void canStartSprinting(CallbackInfoReturnable<Boolean> cir) {
         if (Isaac.game != null && Isaac.game.gameState == Game.State.RUNNING)
-            ci.cancel();
+            cir.setReturnValue(false);
     }
 }

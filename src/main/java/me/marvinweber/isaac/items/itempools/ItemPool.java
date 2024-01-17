@@ -4,9 +4,9 @@ import me.marvinweber.isaac.Isaac;
 import me.marvinweber.isaac.items.IsaacItem;
 import me.marvinweber.isaac.registry.common.ItemRegistry;
 import net.minecraft.item.Item;
+import net.minecraft.util.math.random.Random;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class ItemPool {
     public String name;

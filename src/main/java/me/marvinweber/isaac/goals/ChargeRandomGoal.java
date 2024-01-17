@@ -9,6 +9,7 @@ import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -56,7 +57,7 @@ public class ChargeRandomGoal extends Goal {
     public void start() {
         double f = this.target.x - this.mob.getPos().x;
         double h = this.target.z - this.mob.getPos().z;
-        if(!this.mob.world.getBlockState(new BlockPos(this.target)).isAir()){
+        if(!this.mob.world.getBlockState(new BlockPos(new Vec3i((int) this.target.getX(), (int) this.target.getY(), (int) this.target.getZ()))).isAir()){
             f = -f;
             h = -h;
         }

@@ -2,10 +2,10 @@ package me.marvinweber.isaac.entities;
 
 import me.marvinweber.isaac.Game;
 import me.marvinweber.isaac.Isaac;
+import me.marvinweber.isaac.debug.DebugOptions;
 import me.marvinweber.isaac.items.IsaacItem;
-import me.marvinweber.isaac.packets.HealthRemovePacket;
 import me.marvinweber.isaac.packets.HealthUpdatePacket;
-import me.marvinweber.isaac.packets.StatsRemovePacket;
+import me.marvinweber.isaac.packets.StateUpdatePacket;
 import me.marvinweber.isaac.packets.StatsUpdatePacket;
 import me.marvinweber.isaac.registry.common.ItemRegistry;
 import me.marvinweber.isaac.registry.common.PacketRegistry;
@@ -79,9 +79,7 @@ public class Player {
         this.playerEntity.getInventory().clear();
         this.playerEntity.changeGameMode(GameMode.CREATIVE);
         this.playerStats = null;
-        ServerPlayNetworking.send(this.playerEntity, PacketRegistry.STATS_REMOVE_PACKET, StatsRemovePacket.create());
         this.healthManager = null;
-        ServerPlayNetworking.send(this.playerEntity, PacketRegistry.HEALTH_REMOVE_PACKET, HealthRemovePacket.create());
     }
 
     public void update() {
@@ -107,13 +105,14 @@ public class Player {
 
     public void onUpdateRecalculateStats() {
         this.playerStats.calculate(items);
-        ServerPlayNetworking.send(this.playerEntity, PacketRegistry.STATS_UPDATE_PACKET, StatsUpdatePacket.create(this.playerStats));
+
+        Isaac.PLAYER_CHANNEL.serverHandle(this.playerEntity).send(new StatsUpdatePacket(this.playerStats));
         Objects.requireNonNull(this.playerEntity.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(this.playerStats.speed.current * 0.1f * 1.7);
     }
 
     public void onUpdateHealth() {
         this.healthManager.update();
-        ServerPlayNetworking.send(this.playerEntity, PacketRegistry.HEALTH_UPDATE_PACKET, HealthUpdatePacket.create(this.healthManager));
+        Isaac.PLAYER_CHANNEL.serverHandle(this.playerEntity).send(new HealthUpdatePacket(this.healthManager.hearts));
     }
 
     public void addItem(IsaacItem item) {
@@ -123,7 +122,7 @@ public class Player {
     }
 
     public void hit(int damage) {
-        if(this.hitCooldown > 0) {
+        if(this.hitCooldown > 0 || Isaac.game.activeDebugOptions.contains(DebugOptions.INFINITE_HP)) {
             return;
         }
         this.healthManager.damage(damage);

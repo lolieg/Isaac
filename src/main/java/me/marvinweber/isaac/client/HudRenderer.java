@@ -1,5 +1,6 @@
 package me.marvinweber.isaac.client;
 
+import me.marvinweber.isaac.Game;
 import me.marvinweber.isaac.stats.PlayerStats;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,7 +14,7 @@ public class HudRenderer {
 
     public void render(MatrixStack matrices) {
         PlayerStats playerStats = IsaacClient.playerStats;
-        if (playerStats == null) return;
+        if (playerStats == null || IsaacClient.stateManager.gameState == Game.State.STOPPED) return;
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
 
         float[] stats = new float[]{playerStats.speed.getCurrentRounded(), playerStats.damage.getCurrentRounded(), playerStats.tears.getTearsPerSecond(true), playerStats.range.getCurrentRounded(), playerStats.shotSpeed.getCurrentRounded(), playerStats.luck.getCurrentRounded(), playerStats.knockback.getCurrentRounded()};
@@ -22,5 +23,6 @@ public class HudRenderer {
             name += stats[i];
             minecraftClient.inGameHud.getTextRenderer().draw(matrices, name, minecraftClient.getWindow().getScaledWidth() / 300f, minecraftClient.getWindow().getScaledWidth() / 5f + i * 10, 0xFFFFFF);
         }
+        minecraftClient.inGameHud.getTextRenderer().draw(matrices, IsaacClient.stateManager.gameState.name(), minecraftClient.getWindow().getScaledWidth() / 300f, minecraftClient.getWindow().getScaledWidth() / 5f + 8 * 10, 0xFFFFFF);
     }
 }

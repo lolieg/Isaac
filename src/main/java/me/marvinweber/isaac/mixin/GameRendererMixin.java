@@ -12,21 +12,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
     @Shadow
-    private float movementFovMultiplier;
+    private float fovMultiplier;
 
     @Shadow
-    private float lastMovementFovMultiplier;
+    private float lastFovMultiplier;
 
-    @Inject(at = @At("TAIL"), method = "updateMovementFovMultiplier")
-    private void updateMovementFovMultiplier(CallbackInfo ci) {
+    @Inject(at = @At("TAIL"), method = "updateFovMultiplier")
+    private void updateFovMultiplier(CallbackInfo ci) {
         if (Isaac.game != null && Isaac.game.gameState == Game.State.RUNNING) {
-            this.movementFovMultiplier = 1.0f;
-            this.lastMovementFovMultiplier = 1.0f;
+            this.fovMultiplier = 1.0f;
+            this.lastFovMultiplier = 1.0f;
         }
     }
 
-/*    @ModifyVariable(method = "getFov", at = @At(value = "HEAD"), ordinal = 0)
-    private boolean getFov(boolean b){
-        return false;
-    }*/
 }

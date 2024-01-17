@@ -16,22 +16,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.Packet;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
-import net.minecraft.world.explosion.ExplosionBehavior;
-import net.minecraft.world.gen.DeepslateBlockSource;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.include.com.google.common.collect.Sets;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 
 public class BombEntity extends Entity {
 
@@ -42,7 +34,6 @@ public class BombEntity extends Entity {
 
     public BombEntity(EntityType<? extends Entity> entityType, World world) {
         super(entityType, world);
-        this.inanimate = true;
     }
 
     public BombEntity(World world, double x, double y, double z, @Nullable LivingEntity igniter) {
@@ -65,10 +56,6 @@ public class BombEntity extends Entity {
         return Entity.MoveEffect.NONE;
     }
 
-    @Override
-    public boolean collides() {
-        return !this.isRemoved();
-    }
 
     @Override
     public void tick() {
@@ -95,7 +82,7 @@ public class BombEntity extends Entity {
     }
 
     private void explode() {
-        Explosion explosion = this.world.createExplosion(this, null, new BombExplosionBehavior(), this.getX(), this.getBodyY(0.0625), this.getZ(), 2.5f, false, Explosion.DestructionType.BREAK);
+        Explosion explosion = this.world.createExplosion(this, null, new BombExplosionBehavior(), this.getX(), this.getBodyY(0.0625), this.getZ(), 2.5f, false, World.ExplosionSourceType.BLOCK);
         explosion.getAffectedPlayers().forEach(((playerEntity, vec3d) -> {
             Player player = Player.findPlayer(playerEntity.getUuid());
             if (player == null) return;
@@ -133,7 +120,7 @@ public class BombEntity extends Entity {
     }
 
     @Override
-    public Packet<?> createSpawnPacket() {
+    public Packet<ClientPlayPacketListener> createSpawnPacket() {
         return new EntitySpawnS2CPacket(this);
     }
 }

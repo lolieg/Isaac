@@ -1,6 +1,7 @@
 package me.marvinweber.isaac.stats;
 
 import me.marvinweber.isaac.entities.Player;
+import net.minecraft.network.PacketByteBuf;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,6 +108,28 @@ public class HealthManager {
             if (this.heartSate == HeartSate.HALF) {
                 this.heartSate = HeartSate.FULL;
             }
+        }
+
+        public static void serialize(PacketByteBuf packetByteBuf, Heart heart) {
+            packetByteBuf.writeString(heart.getClass().getName());
+            packetByteBuf.writeEnumConstant(heart.heartSate);
+        }
+
+        public static Heart deserialize(PacketByteBuf packetByteBuf) {
+            String type = packetByteBuf.readString();
+
+            HeartSate heartSate = packetByteBuf.readEnumConstant(HeartSate.class);
+            if (type.equals(Heart.class.getName())) {
+                return new Heart(heartSate);
+            }
+            if (type.equals(RedHeartContainer.class.getName())) {
+                return new RedHeartContainer(heartSate);
+            }
+            if (type.equals(SoulHeart.class.getName())) {
+                return new SoulHeart(heartSate);
+            }
+
+            return new Heart(heartSate);
         }
     }
 

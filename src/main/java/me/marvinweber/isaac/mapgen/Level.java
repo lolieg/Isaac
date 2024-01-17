@@ -6,10 +6,13 @@ import me.marvinweber.isaac.mapgen.rooms.*;
 import me.marvinweber.isaac.mapgen.rooms.layouts.RoomLayout;
 import me.marvinweber.isaac.mapgen.rooms.layouts.RoomsParser;
 import net.minecraft.util.Pair;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static me.marvinweber.isaac.Utility.getRandomNumber;
 import static me.marvinweber.isaac.Utility.splitNumber;

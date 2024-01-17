@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class Door {
     public Room room;
-    public ArrayList<Vec3d> coords;
+    public ArrayList<Vec3i> coords;
     public Room.Face face;
     public DoorState doorState;
     public BlockState defaultDoor = Blocks.BEDROCK.getDefaultState();
@@ -39,9 +40,9 @@ public class Door {
             for (int y = room.properties.defaultHeight + 1; y < room.properties.defaultHeight + 5; y++) {
                 if (y != room.properties.defaultHeight + 4 && doorCoords.contains(i)) {
                     if (face == Room.Face.NORTH || face == Room.Face.SOUTH)
-                        coords.add(new Vec3d(i, y, unchangedCord));
+                        coords.add(new Vec3i(i, y, unchangedCord));
                     if (face == Room.Face.EAST || face == Room.Face.WEST)
-                        coords.add(new Vec3d(unchangedCord, y, i));
+                        coords.add(new Vec3i(unchangedCord, y, i));
                 }
             }
         }
@@ -49,7 +50,7 @@ public class Door {
     }
 
     public void modify(World world, DoorState doorState) {
-        for (Vec3d pos :
+        for (Vec3i pos :
                 this.coords) {
             if (doorState == DoorState.AIR) {
                 world.setBlockState(new BlockPos(pos), Blocks.AIR.getDefaultState());

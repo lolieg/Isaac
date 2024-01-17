@@ -1,5 +1,7 @@
 package me.marvinweber.isaac.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import me.marvinweber.isaac.Game;
 import me.marvinweber.isaac.client.IsaacClient;
 import me.marvinweber.isaac.stats.HealthManager;
 import net.minecraft.client.gui.DrawableHelper;
@@ -18,15 +20,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class InGameHudMixin extends DrawableHelper {
     @Shadow private int scaledWidth;
 
-    @Shadow protected abstract void renderOverlay(Identifier texture, float opacity);
+    @Shadow protected abstract void renderOverlay(MatrixStack matrices, Identifier texture, float opacity);
 
     @Shadow @Final private static Identifier POWDER_SNOW_OUTLINE;
 
     @Inject(at = @At("TAIL"), method = "render")
     private void render(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
         IsaacClient.hudRenderer.render(matrices);
-        if(IsaacClient.healthManager != null && IsaacClient.healthManager.getHealthAmount() <= 1) {
-            this.renderOverlay(POWDER_SNOW_OUTLINE, 1f);
+        IsaacClient.map.render(matrices);
+        if(IsaacClient.healthManager != null && IsaacClient.healthManager.getHealthAmount() <= 1 && IsaacClient.stateManager.gameState != Game.State.STOPPED) {
+            this.renderOverlay(matrices, POWDER_SNOW_OUTLINE, 1f);
+//            RenderSystem.setShaderColor(1f, 0.9f, 0.9f, 1f);
+//            System.out.println("here");
+        } else {
+//            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+//            System.out.println("here");
         }
 
     }
@@ -35,7 +43,7 @@ public abstract class InGameHudMixin extends DrawableHelper {
     private void renderHealthBar(MatrixStack matrices, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking, CallbackInfo ci) {
         ci.cancel();
 
-        if (IsaacClient.healthManager == null) return;
+        if (IsaacClient.healthManager == null || IsaacClient.stateManager.gameState == Game.State.STOPPED) return;
         lines = IsaacClient.healthManager.hearts.size() > 6 ? 10 : 11;
 
         int j = IsaacClient.healthManager.getHeartsAmount();

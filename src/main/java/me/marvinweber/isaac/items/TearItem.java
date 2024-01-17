@@ -41,7 +41,7 @@ public class TearItem extends Item {
         TearEntity tearEntity;
         tearEntity = new TearEntity(world, user);
         tearEntity.setItem(itemStack);
-        tearEntity.setProperties(user, user.getPitch(), yaw, 0.0F, 0F, 0F);
+        tearEntity.setVelocity(user, user.getPitch(), yaw, 0.0F, 0F, 0F);
         world.spawnEntity(tearEntity);
     }
 

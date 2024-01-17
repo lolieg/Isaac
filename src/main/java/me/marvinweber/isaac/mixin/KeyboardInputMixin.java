@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(KeyboardInput.class)
 public class KeyboardInputMixin extends Input {
     @Inject(at = @At("TAIL"), method = "tick")
-    private void tick(boolean slowDown, CallbackInfo ci) {
+    private void tick(boolean slowDown, float f, CallbackInfo ci) {
         if (Isaac.game != null && Isaac.game.gameState == Game.State.RUNNING)
             this.sneaking = false;
     }

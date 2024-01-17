@@ -1,0 +1,8 @@
+{
+  "stomp": {
+    "sounds": [
+      "isaac:stomp"
+    ],
+    "subtitle": "Monster Stomp"
+  }
+}

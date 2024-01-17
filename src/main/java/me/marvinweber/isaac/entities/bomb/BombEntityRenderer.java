@@ -3,6 +3,7 @@ package me.marvinweber.isaac.entities.bomb;
 import me.marvinweber.isaac.Isaac;
 import me.marvinweber.isaac.registry.common.BlockRegistry;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -12,7 +13,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
+
 
 public class BombEntityRenderer extends EntityRenderer<BombEntity> {
     public BombEntityRenderer(EntityRendererFactory.Context context) {
@@ -24,9 +26,9 @@ public class BombEntityRenderer extends EntityRenderer<BombEntity> {
     public void render(BombEntity tntEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         matrixStack.push();
         int j = tntEntity.getFuse();
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-90.0f));
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90.0f));
-        TntMinecartEntityRenderer.renderFlashingBlock(BlockRegistry.BOMB_BLOCK.getDefaultState(), matrixStack, vertexConsumerProvider, i, j / 5 % 2 == 0);
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-90.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90.0f));
+        TntMinecartEntityRenderer.renderFlashingBlock(MinecraftClient.getInstance().getBlockRenderManager(), BlockRegistry.BOMB_BLOCK.getDefaultState(), matrixStack, vertexConsumerProvider, i, j / 5 % 2 == 0);
         matrixStack.pop();
         super.render(tntEntity, f, g, matrixStack, vertexConsumerProvider, i);
     }

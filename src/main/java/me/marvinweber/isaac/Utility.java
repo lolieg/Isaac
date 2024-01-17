@@ -1,9 +1,10 @@
 package me.marvinweber.isaac;
 
 import net.minecraft.util.Pair;
+import net.minecraft.util.math.random.Random;
 
 import java.security.SecureRandom;
-import java.util.Random;
+
 
 public class Utility {
     static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

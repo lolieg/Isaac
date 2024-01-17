@@ -1,5 +1,7 @@
 package me.marvinweber.isaac.items.passive;
 
+import io.wispforest.owo.itemgroup.OwoItemSettings;
+import me.marvinweber.isaac.Isaac;
 import me.marvinweber.isaac.entities.BaseEnemyNearbyPredicate;
 import me.marvinweber.isaac.entities.BaseEntity;
 import me.marvinweber.isaac.entities.Player;
@@ -12,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.TypeFilter;
@@ -24,20 +26,20 @@ import java.util.List;
 
 public class MyReflectionItem extends IsaacItem {
     public MyReflectionItem() {
-        super(new Item.Settings().group(ItemGroup.MISC).maxCount(1));
+        super(new OwoItemSettings().group(Isaac.ISAAC_ITEMS).maxCount(1));
         this.ID = 5;
         this.statModifiers.put("myReflectionMultiplier", 0f);
         this.statModifiers.put("range", 1.5f);
     }
     @Override
     public Text getName(ItemStack itemStack) {
-        return new LiteralText("My Reflection").formatted(Formatting.AQUA, Formatting.BOLD);
+        return Text.literal("My Reflection").formatted(Formatting.AQUA, Formatting.BOLD);
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(new LiteralText("Boomerang Tears").formatted(Formatting.ITALIC));
-        tooltip.add(new LiteralText("Effects: Isaac's tears travel a short distance, then reverse direction and return to Isaac. \n 1.6x+1.5 Range. \n 1.6x Shot Speed Multiplier").formatted(Formatting.GOLD));
+        tooltip.add(Text.literal("Boomerang Tears").formatted(Formatting.ITALIC));
+        tooltip.add(Text.literal("Effects: Isaac's tears travel a short distance, then reverse direction and return to Isaac. \n 1.6x+1.5 Range. \n 1.6x Shot Speed Multiplier").formatted(Formatting.GOLD));
     }
 
     @Override

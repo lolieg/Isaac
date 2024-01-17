@@ -2,27 +2,18 @@ package me.marvinweber.isaac.entities;
 
 import me.marvinweber.isaac.Isaac;
 import me.marvinweber.isaac.blocks.multiblock.Multiblock;
-import me.marvinweber.isaac.blocks.multiblock.MultiblockPart;
 import me.marvinweber.isaac.items.IsaacItem;
-import me.marvinweber.isaac.packets.EntitySpawnPacket;
 import me.marvinweber.isaac.registry.common.EntityRegistry;
 import me.marvinweber.isaac.registry.common.ItemRegistry;
-import me.marvinweber.isaac.registry.common.PacketRegistry;
 import me.marvinweber.isaac.registry.common.ParticleRegistry;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
-import net.minecraft.network.Packet;
-import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -34,6 +25,7 @@ import net.minecraft.world.World;
 import java.util.Objects;
 
 public class TearEntity extends ThrownItemEntity {
+    public BaseEntity lastTarget;
     private Vec3d spawnPos;
 
     public TearEntity(EntityType<? extends ThrownItemEntity> entityType, World world) {
@@ -51,11 +43,7 @@ public class TearEntity extends ThrownItemEntity {
         this.setNoGravity(true);
     }
 
-    @Override
-    public Packet<?> createSpawnPacket() {
-        this.spawnPos = this.getPos();
-        return EntitySpawnPacket.create(this, PacketRegistry.SPAWN_PACKET);
-    }
+
 
     @Override
     protected Item getDefaultItem() {
@@ -79,7 +67,7 @@ public class TearEntity extends ThrownItemEntity {
         if (entity instanceof LivingEntity livingEntity && !world.isClient() && player != null) {
             this.world.sendEntityStatus(this, (byte) 3);
             // Damage
-            entity.damage(DamageSource.thrownProjectile(this, this.getOwner()), player.playerStats.damage.current);
+            entity.damage(this.getDamageSources().thrown(this, this.getOwner()), player.playerStats.damage.current);
             // Knockback stat
             livingEntity.takeKnockback(player.playerStats.knockback.current, MathHelper.sin(Objects.requireNonNull(this.getOwner()).getYaw() * ((float) Math.PI / 180)), -MathHelper.cos(Objects.requireNonNull(this.getOwner()).getYaw() * ((float) Math.PI / 180)));
         }
@@ -90,7 +78,7 @@ public class TearEntity extends ThrownItemEntity {
         BlockPos pos = blockHitResult.getBlockPos();
         BlockState blockState = this.world.getBlockState(pos);
         if(blockState.getBlock() instanceof Multiblock) {
-            ((Multiblock) blockState.getBlock()).breakBlocks(world, pos, blockState, DamageSource.thrownProjectile(this, this.getOwner()), Isaac.game.getPlayer((PlayerEntity) getOwner()));
+            ((Multiblock) blockState.getBlock()).breakBlocks(world, pos, blockState, this.getDamageSources().thrown(this, this.getOwner()), Isaac.game.getPlayer((PlayerEntity) getOwner()));
         }
     }
 

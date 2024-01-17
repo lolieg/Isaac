@@ -1,8 +1,11 @@
 package me.marvinweber.isaac.stats;
 
 
+import me.marvinweber.isaac.client.IsaacClient;
 import me.marvinweber.isaac.items.IsaacItem;
+import net.minecraft.network.PacketByteBuf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerStats {
@@ -36,5 +39,18 @@ public class PlayerStats {
         knockback.calculate(items);
     }
 
+    public static void serialize(PacketByteBuf packetByteBuf, PlayerStats playerStats) {
+        packetByteBuf.writeFloat(playerStats.damage.current);
+        packetByteBuf.writeFloat(playerStats.tears.current);
+        packetByteBuf.writeFloat(playerStats.range.current);
+        packetByteBuf.writeFloat(playerStats.shotSpeed.current);
+        packetByteBuf.writeFloat(playerStats.speed.current);
+        packetByteBuf.writeFloat(playerStats.luck.current);
+        packetByteBuf.writeFloat(playerStats.knockback.current);
+    }
+
+    public static PlayerStats deserialize(PacketByteBuf packetByteBuf) {
+        return new PlayerStats(new ArrayList<>(), packetByteBuf.readFloat(), packetByteBuf.readFloat(), packetByteBuf.readFloat(), packetByteBuf.readFloat(), packetByteBuf.readFloat(), packetByteBuf.readFloat(), packetByteBuf.readFloat());
+    }
 }
 

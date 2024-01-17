@@ -3,7 +3,7 @@ package me.marvinweber.isaac;
 import me.marvinweber.isaac.entities.Player;
 import net.minecraft.scoreboard.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class ScoreboardUtil {
@@ -27,7 +27,7 @@ public class ScoreboardUtil {
     private static void updateProperty(ServerScoreboard scoreboard, String propertyName, String newValue) {
         Team team = scoreboard.getTeam(propertyName);
         if (team != null)
-            team.setPrefix(new LiteralText(newValue));
+            team.setPrefix(Text.literal(newValue));
     }
 
     public static void start(MinecraftServer t) {
@@ -36,7 +36,7 @@ public class ScoreboardUtil {
         if (server != null) {
             scoreboard.removeObjective(server);
         }
-        server = scoreboard.addObjective("server", ScoreboardCriterion.DUMMY, new LiteralText("The Binding of Steve").formatted(Formatting.BOLD, Formatting.GOLD), ScoreboardCriterion.RenderType.INTEGER);
+        server = scoreboard.addObjective("server", ScoreboardCriterion.DUMMY, Text.literal("The Binding of Steve").formatted(Formatting.BOLD, Formatting.GOLD), ScoreboardCriterion.RenderType.INTEGER);
         scoreboard.setObjectiveSlot(1, server);
 
         addConstantProperty(scoreboard, server, "Room: ", 15);
@@ -52,7 +52,7 @@ public class ScoreboardUtil {
         Team team = new Team(scoreboard, propertyName);
         scoreboard.addTeam(propertyName);
         scoreboard.addPlayerToTeam("", team);
-        team.setPrefix(new LiteralText(defaultValue));
+        team.setPrefix(Text.literal(defaultValue));
         scoreboard.getPlayerScore("", server).setScore(pos);
     }
 

@@ -1,6 +1,7 @@
 package me.marvinweber.isaac.mixin;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import me.marvinweber.isaac.blocks.multiblock.Multiblock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -19,16 +20,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 @Mixin(Explosion.class)
-public class ExplosionMixin{
+public abstract class ExplosionMixin{
 
     @Shadow @Final private World world;
 
+    @Shadow @Nullable public abstract Entity getEntity();
+
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"), method = "affectWorld", locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-    private void affectWorld(boolean particles, CallbackInfo ci, boolean bl, ObjectArrayList objectArrayList, Iterator var4, BlockPos blockPos, BlockState blockState, Block block) {
+    private void affectWorld(boolean particles, CallbackInfo ci, boolean bl, ObjectArrayList objectArrayList, boolean bl2, ObjectListIterator var5, BlockPos blockPos, BlockState blockState, Block block) {
         if (blockState.getBlock() instanceof Multiblock) {
-            ((Multiblock) blockState.getBlock()).breakBlocks(world, blockPos, blockState, DamageSource.explosion((Explosion)(Object)this), null);
+            ((Multiblock) blockState.getBlock()).breakBlocks(world, blockPos, blockState, Objects.requireNonNull(this.getEntity()).getDamageSources().explosion((Explosion)(Object)this), null);
         }
     }
 }

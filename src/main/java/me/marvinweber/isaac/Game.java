@@ -1,5 +1,6 @@
 package me.marvinweber.isaac;
 
+import me.marvinweber.isaac.debug.DebugOptions;
 import me.marvinweber.isaac.entities.BaseEntity;
 import me.marvinweber.isaac.entities.Player;
 import me.marvinweber.isaac.items.itempools.ItemPool;
@@ -7,18 +8,20 @@ import me.marvinweber.isaac.items.itempools.ItemPoolsParser;
 import me.marvinweber.isaac.mapgen.Door;
 import me.marvinweber.isaac.mapgen.Level;
 import me.marvinweber.isaac.mapgen.Room;
+import me.marvinweber.isaac.packets.MapUpdatePacket;
+import me.marvinweber.isaac.packets.StateUpdatePacket;
 import me.marvinweber.isaac.stats.CharacterBaseStats;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 import static me.marvinweber.isaac.Utility.getRandomNumber;
 import static me.marvinweber.isaac.Utility.randomString;
@@ -35,9 +38,11 @@ public class Game {
 
     public HashMap<String, ItemPool> itemPools;
 
+    public Collection<DebugOptions> activeDebugOptions;
+
     public Game(MinecraftServer server) {
 
-        this.random = new Random(randomString(8).hashCode());
+        this.random = Random.create(randomString(8).hashCode());
         this.server = server;
         this.world = server.getOverworld();
         this.gameState = State.STOPPED;
@@ -46,12 +51,20 @@ public class Game {
 //        this.level = new Level(this.random, 30);
         this.players = new ArrayList<>();
         this.itemPools = ItemPoolsParser.parse();
+        this.activeDebugOptions = new ArrayList<>();
+        onGameStateChanged();
+    }
+
+    public void pause() {
+        onGameStateChanged();
     }
 
     public void start() {
         this.gameState = State.GENERATING;
 
         this.server.getGameRules().get(GameRules.DO_FIRE_TICK).set(false, this.server);
+        this.server.getGameRules().get(GameRules.BLOCK_EXPLOSION_DROP_DECAY).set(false, this.server);
+        this.world.setSpawnPos(new BlockPos(0, 0, -21474836), 0.0f);
 
         updateRandomSeed();
         level.generate(this.server.getOverworld());
@@ -68,6 +81,8 @@ public class Game {
         });
         ScoreboardUtil.start(server);
         this.gameState = State.RUNNING;
+        onGameStateChanged();
+        onMapUpdate();
     }
 
     private void updateRandomSeed() {
@@ -90,6 +105,7 @@ public class Game {
         });
 
         this.gameState = State.STOPPED;
+        onGameStateChanged();
     }
 
     public void restart() {
@@ -111,6 +127,16 @@ public class Game {
             }
             this.players.forEach(Player::update);
             ScoreboardUtil.tick(server, this);
+            this.tickDebug();
+        }
+    }
+
+    private void tickDebug() {
+        if(this.activeDebugOptions.contains(DebugOptions.QUICK_KILL)) {
+            assert this.currentRoom != null;
+            this.currentRoom.enemies.forEach(baseEntity -> {
+                baseEntity.damage(baseEntity.getDamageSources().outOfWorld(), Float.MAX_VALUE);
+            });
         }
     }
 
@@ -132,6 +158,19 @@ public class Game {
 
         newRoom.entered = true;
         this.currentRoom = newRoom;
+
+        onMapUpdate();
+    }
+
+    public void onMapUpdate() {
+        this.level.rooms.stream()
+                .filter(room -> (room.gridX == currentRoom.gridX + 1 && room.gridY == currentRoom.gridY) ||
+                        (room.gridX == currentRoom.gridX - 1 && room.gridY == currentRoom.gridY) ||
+                        (room.gridX == currentRoom.gridX && room.gridY == currentRoom.gridY + 1) ||
+                        (room.gridX == currentRoom.gridX && room.gridY == currentRoom.gridY - 1))
+                .forEach(room -> room.visible = true);
+
+        Isaac.GAME_CHANNEL.serverHandle(players.stream().map(player1 -> player1.playerEntity).toList()).send(new MapUpdatePacket(this.level.rooms, this.currentRoom));
     }
 
     public void onInDoorSpace(Room room, Door door, Player player) {
@@ -148,7 +187,10 @@ public class Game {
                 player1.playerEntity.teleport(doorEntry.x, doorEntry.y, doorEntry.z);
             });
         }
+    }
 
+    public void onGameStateChanged() {
+        Isaac.GAME_CHANNEL.serverHandle(this.server.getPlayerManager().getPlayerList()).send(new StateUpdatePacket(this.gameState));
     }
 
     private void setPlayers() {

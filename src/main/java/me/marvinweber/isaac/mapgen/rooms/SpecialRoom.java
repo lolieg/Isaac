@@ -3,11 +3,12 @@ package me.marvinweber.isaac.mapgen.rooms;
 import me.marvinweber.isaac.mapgen.Room;
 import me.marvinweber.isaac.mapgen.rooms.layouts.RoomLayout;
 import me.marvinweber.isaac.mapgen.rooms.layouts.SpecialRooms;
+import net.minecraft.util.math.random.Random;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
+
 import java.util.stream.Stream;
 
 public class SpecialRoom extends Room {

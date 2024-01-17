@@ -18,14 +18,27 @@ public class BaseEntity extends PathAwareEntity {
     }
 
     @Override
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
+        return false;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (isDead()) {
+            this.onDeath(this.getRecentDamageSource());
+        }
+    }
+
+    @Override
     public boolean damage(DamageSource source, float amount) {
-        if (source.isExplosive()) {
+        if (source.getType().msgId().equals("explosion")) {
             this.setHealth(this.getHealth() - 100);
         } else {
             this.setHealth(this.getHealth() - amount);
         }
         if (this.isDead()){
-            this.onDeath(source);
+            return false;
         }
         return true;
     }
